@@ -122,7 +122,7 @@ func (mod *modContext) namingContext(pkg *schema.Package) (namingCtx *modContext
 	namingCtx = mod
 	if pkg != nil && pkg != mod.pkg {
 		external = true
-		pkgName = pkg.Name + "."
+		pkgName = makeValidIdentifier(pkg.Name) + "."
 
 		var info NodePackageInfo
 		contract.AssertNoError(pkg.ImportLanguages(map[string]schema.Language{"nodejs": Importer}))
@@ -890,7 +890,7 @@ func (mod *modContext) getTypeImports(t schema.Type, recurse bool, externalImpor
 		// If it's from another package, add an import for the external package.
 		if t.Package != nil && t.Package != mod.pkg {
 			pkg := t.Package.Name
-			externalImports.Add(fmt.Sprintf("import * as %[1]s from \"@pulumi/%[1]s\";", pkg))
+			externalImports.Add(fmt.Sprintf("import * as %s from \"@pulumi/%s\";", makeValidIdentifier(pkg), pkg))
 			return false
 		}
 
@@ -902,7 +902,7 @@ func (mod *modContext) getTypeImports(t schema.Type, recurse bool, externalImpor
 		// If it's from another package, add an import for the external package.
 		if t.Resource != nil && t.Resource.Package != mod.pkg {
 			pkg := t.Resource.Package.Name
-			externalImports.Add(fmt.Sprintf("import * as %[1]s from \"@pulumi/%[1]s\";", pkg))
+			externalImports.Add(fmt.Sprintf("import * as %s from \"@pulumi/%s\";", makeValidIdentifier(pkg), pkg))
 			return false
 		}
 
